@@ -1,161 +1,287 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Food Ordering API</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍔 Food Ordering App</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; }
 
-<style>
+        header {
+            background: #e74c3c;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
 
-body{
-    font-family: Arial, sans-serif;
-    background: #f8fafc;
-    margin: 0;
-    padding: 40px;
-    text-align: center;
-}
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
 
-.container{
-    max-width: 900px;
-    margin: auto;
-}
+        h2 { margin-bottom: 15px; color: #e74c3c; }
 
-h1{
-    margin-bottom: 10px;
-}
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
 
-.subtitle{
-    color: #555;
-    margin-bottom: 30px;
-}
+        .menu-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .menu-card:hover { transform: translateY(-4px); }
+        .menu-card .emoji { font-size: 2rem; }
+        .menu-card .name { font-weight: bold; margin: 8px 0 4px; }
+        .menu-card .price { color: #e74c3c; font-weight: 600; }
+        .menu-card .select-btn {
+            margin-top: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
 
-.card{
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    margin-bottom: 25px;
-}
+        .order-form {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        .order-form label { display: block; margin-bottom: 6px; font-weight: 600; }
+        .order-form select, .order-form input {
+            width: 100%; padding: 10px; border: 1px solid #ddd;
+            border-radius: 6px; margin-bottom: 15px; font-size: 1rem;
+        }
+        .order-form button {
+            background: #e74c3c; color: white; border: none;
+            padding: 12px 28px; border-radius: 8px; font-size: 1rem;
+            cursor: pointer; width: 100%;
+        }
 
-.features{
-    text-align: left;
-    display: inline-block;
-}
+        .order-card {
+            background: white;
+            border-radius: 10px;
+            padding: 18px 22px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .order-info .id { font-size: 0.8rem; color: #999; }
+        .order-info .item-name { font-weight: bold; font-size: 1rem; }
+        .order-info .details { font-size: 0.85rem; color: #666; margin-top: 4px; }
 
-.features li{
-    margin: 10px 0;
-}
+        .status-badge {
+            padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;
+        }
+        .status-Preparing  { background: #fef3cd; color: #856404; }
+        .status-Delivered  { background: #d1e7dd; color: #0f5132; }
+        .status-Cancelled  { background: #f8d7da; color: #842029; }
 
-button{
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-}
+        .order-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .order-actions select {
+            padding: 5px 8px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.85rem;
+        }
+        .btn-update {
+            background: #3498db; color: white; border: none;
+            padding: 6px 12px; border-radius: 6px; cursor: pointer;
+        }
+        .btn-delete {
+            background: #e74c3c; color: white; border: none;
+            padding: 6px 12px; border-radius: 6px; cursor: pointer;
+        }
 
-button:hover{
-    background: #1d4ed8;
-}
-
-#menu{
-    margin-top: 25px;
-}
-
-.menu-item{
-    background: #f3f4f6;
-    padding: 15px;
-    border-radius: 8px;
-    width: 260px;
-    margin: 12px auto;
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.footer{
-    color: #666;
-    margin-top: 30px;
-}
-
-</style>
+        .toast {
+            position: fixed; bottom: 20px; right: 20px;
+            color: white; padding: 12px 20px; border-radius: 8px;
+            font-weight: 600; display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 999;
+        }
+        .empty-msg { color: #999; font-style: italic; }
+    </style>
 </head>
-
 <body>
+
+<header>🍔 Food Ordering App</header>
 
 <div class="container">
 
-    <h1>🍔 Food Ordering API</h1>
+    <h2>📋 Menu</h2>
+    <div class="menu-grid" id="menuGrid">Loading menu...</div>
 
-    <p class="subtitle">
-        Backend project developed using Node.js and Express.js
-    </p>
+    <h2>🛒 Place Order</h2>
+    <div class="order-form">
+        <label>Select Item</label>
+        <select id="itemSelect"></select>
 
-    <div class="card">
+        <label>Quantity</label>
+        <input type="number" id="quantityInput" value="1" min="1" />
 
-        <h2>🍔 Smart Food Ordering Platform</h2>
-
-        <p>
-           A web-based backend system that streamlines menu retrieval and food order management.
-        </p>
-
+        <button onclick="placeOrder()">Place Order</button>
     </div>
 
-    <div class="card">
-
-        <h2>Features</h2>
-
-        <ul class="features">
-            <li>🍔 View Food Menu</li>
-            <li>🛒 Create Orders</li>
-            <li>📦 Track Order Status</li>
-            <li>✏️ Update Existing Orders</li>
-            <li>🗑️ Delete Orders</li>
-            <li>💾 JSON-Based Data Storage</li>
-            <li>🔗 Client-Server Communication using Fetch API</li>
-        </ul>
-
-    </div>
-
-    <div class="card">
-
-        <h2>Live API Demonstration</h2>
-
-        <p>
-            Click below to fetch menu data directly from the backend API.
-        </p>
-
-        <button onclick="loadMenu()">
-            Load Menu From Backend
-        </button>
-
-        <div id="menu"></div>
-
-    </div>
-
-    <p class="footer">
-        Built with Node.js, Express.js, HTML, CSS and JavaScript
-    </p>
+    <h2>
+        📦 Your Orders
+        <button onclick="loadOrders()" style="font-size:0.75rem; padding:4px 10px; background:#3498db; color:white; border:none; border-radius:5px; cursor:pointer; margin-left:10px;">Refresh</button>
+    </h2>
+    <div id="ordersList"><p class="empty-msg">No orders yet.</p></div>
 
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
+    const API = "http://localhost:3000";
+    const emojis = {
+        "Burger": "🍔",
+        "Pizza": "🍕",
+        "Shawarma": "🌯",
+        "Fried Rice": "🍚",
+        "Biriyani": "🍛"
+    };
 
-async function loadMenu() {
+    // Load and display menu from backend
+    async function loadMenu() {
+        const res = await fetch(`${API}/menu`);
+        const menu = await res.json();
 
-    const response = await fetch("/menu");
+        const grid = document.getElementById("menuGrid");
+        const select = document.getElementById("itemSelect");
+        grid.innerHTML = "";
+        select.innerHTML = "";
 
-    const menu = await response.json();
+        menu.forEach(item => {
+            const emoji = emojis[item.name] || "🍽️";
 
-    document.getElementById("menu").innerHTML =
-        menu.map(item =>
-            `<div class="menu-item">
-                ${item.name} - ₹${item.price}
-            </div>`
-        ).join("");
-}
+            grid.innerHTML += `
+                <div class="menu-card" onclick="selectItem(${item.id})">
+                    <div class="emoji">${emoji}</div>
+                    <div class="name">${item.name}</div>
+                    <div class="price">₹${item.price}</div>
+                    <button class="select-btn">Order</button>
+                </div>`;
 
+            select.innerHTML += `
+                <option value="${item.id}">${emoji} ${item.name} — ₹${item.price}</option>`;
+        });
+    }
+
+    // Click menu card to auto-select in dropdown
+    function selectItem(id) {
+        document.getElementById("itemSelect").value = id;
+        document.querySelector(".order-form").scrollIntoView({ behavior: "smooth" });
+    }
+
+    // Send itemId + quantity to backend, display what backend returns
+    async function placeOrder() {
+        const itemId = parseInt(document.getElementById("itemSelect").value);
+        const quantity = parseInt(document.getElementById("quantityInput").value);
+
+        if (!quantity || quantity <= 0) {
+            return showToast("Enter a valid quantity!", "red");
+        }
+
+        const res = await fetch(`${API}/order`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ itemId, quantity })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            // Display total calculated by backend
+            showToast(`✅ Order placed! Total: ₹${data.total}`);
+            loadOrders();
+        } else {
+            showToast(data.error, "red");
+        }
+    }
+
+    // Display all orders with backend-calculated values
+    async function loadOrders() {
+        const res = await fetch(`${API}/orders`);
+        const orders = await res.json();
+        const container = document.getElementById("ordersList");
+
+        if (orders.length === 0) {
+            container.innerHTML = `<p class="empty-msg">No orders yet.</p>`;
+            return;
+        }
+
+        container.innerHTML = orders.map(o => `
+            <div class="order-card">
+                <div class="order-info">
+                    <div class="id">Order #${o.orderId}</div>
+                    <div class="item-name">${emojis[o.item] || "🍽️"} ${o.item} × ${o.quantity}</div>
+                    <div class="details">
+                        Subtotal ₹${o.subtotal} + GST ₹${o.gst} + Delivery ₹${o.deliveryCharge} = <b>₹${o.total}</b>
+                    </div>
+                </div>
+                <span class="status-badge status-${o.status}">${o.status}</span>
+                <div class="order-actions">
+                    <select id="status-${o.orderId}">
+                        <option value="Preparing" ${o.status === "Preparing" ? "selected" : ""}>Preparing</option>
+                        <option value="Delivered" ${o.status === "Delivered" ? "selected" : ""}>Delivered</option>
+                        <option value="Cancelled" ${o.status === "Cancelled" ? "selected" : ""}>Cancelled</option>
+                    </select>
+                    <button class="btn-update" onclick="updateOrder(${o.orderId})">Update</button>
+                    <button class="btn-delete" onclick="deleteOrder(${o.orderId})">Delete</button>
+                </div>
+            </div>
+        `).join("");
+    }
+
+    // Send updated status to backend
+    async function updateOrder(id) {
+        const status = document.getElementById(`status-${id}`).value;
+        const res = await fetch(`${API}/order/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status })
+        });
+        if (res.ok) {
+            showToast("✅ Status updated!");
+            loadOrders();
+        }
+    }
+
+    // Delete order via backend
+    async function deleteOrder(id) {
+        if (!confirm("Delete this order?")) return;
+        const res = await fetch(`${API}/order/${id}`, { method: "DELETE" });
+        if (res.ok) {
+            showToast("🗑️ Order deleted!", "red");
+            loadOrders();
+        }
+    }
+
+    // Toast notification
+    function showToast(msg, color = "green") {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.style.background = color === "red" ? "#e74c3c" : "#2ecc71";
+        t.style.display = "block";
+        setTimeout(() => t.style.display = "none", 3000);
+    }
+
+    loadMenu();
+    loadOrders();
 </script>
 
 </body>

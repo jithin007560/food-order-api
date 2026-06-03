@@ -3,7 +3,10 @@ const express = require("express");
 const app = express();
 
 app.use(express.json());
-app.use(express.static("public"));
+
+// Serve index.html
+const path = require("path");
+app.use(express.static(path.join(__dirname)));
 
 // Menu Items
 const menu = [
@@ -17,12 +20,17 @@ const menu = [
 // Orders Storage
 const orders = [];
 
+// Home Route
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "index.html"));
+});
+
 // Get Menu
 app.get("/menu", (req, res) => {
     res.json(menu);
 });
 
-// Place Order
+// Place Order — all calculations done here
 app.post("/order", (req, res) => {
 
     const { itemId, quantity } = req.body;
@@ -30,22 +38,26 @@ app.post("/order", (req, res) => {
     const item = menu.find(food => food.id === itemId);
 
     if (!item) {
-        return res.status(404).json({
-            error: "Food item not found"
-        });
+        return res.status(404).json({ error: "Food item not found" });
     }
 
     if (!quantity || quantity <= 0) {
-        return res.status(400).json({
-            error: "Invalid quantity"
-        });
+        return res.status(400).json({ error: "Invalid quantity" });
     }
+
+    const subtotal = item.price * quantity;
+    const gst = subtotal * 0.05;
+    const deliveryCharge = 40;
+    const total = subtotal + gst + deliveryCharge;
 
     const order = {
         orderId: orders.length + 1,
         item: item.name,
         quantity,
-        total: item.price * quantity,
+        subtotal,
+        gst,
+        deliveryCharge,
+        total,
         status: "Preparing"
     };
 
@@ -54,7 +66,7 @@ app.post("/order", (req, res) => {
     res.status(201).json(order);
 });
 
-// View Orders
+// View All Orders
 app.get("/orders", (req, res) => {
     res.json(orders);
 });
@@ -63,45 +75,30 @@ app.get("/orders", (req, res) => {
 app.patch("/order/:id", (req, res) => {
 
     const orderId = Number(req.params.id);
-
-    const order = orders.find(
-        o => o.orderId === orderId
-    );
+    const order = orders.find(o => o.orderId === orderId);
 
     if (!order) {
-        return res.status(404).json({
-            error: "Order not found"
-        });
+        return res.status(404).json({ error: "Order not found" });
     }
 
     order.status = req.body.status;
 
-    res.json({
-        message: "Order updated successfully",
-        order
-    });
+    res.json({ message: "Order updated successfully", order });
 });
 
 // Delete Order
 app.delete("/order/:id", (req, res) => {
 
     const orderId = Number(req.params.id);
-
-    const index = orders.findIndex(
-        o => o.orderId === orderId
-    );
+    const index = orders.findIndex(o => o.orderId === orderId);
 
     if (index === -1) {
-        return res.status(404).json({
-            error: "Order not found"
-        });
+        return res.status(404).json({ error: "Order not found" });
     }
 
     orders.splice(index, 1);
 
-    res.json({
-        message: "Order deleted successfully"
-    });
+    res.json({ message: "Order deleted successfully" });
 });
 
 // Start Server
