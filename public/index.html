@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Ordering API</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background: #f8fafc;
+    margin: 0;
+    padding: 40px;
+    text-align: center;
+}
+
+.container{
+    max-width: 900px;
+    margin: auto;
+}
+
+h1{
+    margin-bottom: 10px;
+}
+
+.subtitle{
+    color: #555;
+    margin-bottom: 30px;
+}
+
+.card{
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+}
+
+.features{
+    text-align: left;
+    display: inline-block;
+}
+
+.features li{
+    margin: 10px 0;
+}
+
+button{
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover{
+    background: #1d4ed8;
+}
+
+#menu{
+    margin-top: 25px;
+}
+
+.menu-item{
+    background: #f3f4f6;
+    padding: 15px;
+    border-radius: 8px;
+    width: 260px;
+    margin: 12px auto;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.footer{
+    color: #666;
+    margin-top: 30px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🍔 Food Ordering API</h1>
+
+    <p class="subtitle">
+        Backend project developed using Node.js and Express.js
+    </p>
+
+    <div class="card">
+
+        <h2>🍔 Smart Food Ordering Platform</h2>
+
+        <p>
+           A web-based backend system that streamlines menu retrieval and food order management.
+        </p>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Features</h2>
+
+        <ul class="features">
+            <li>🍔 View Food Menu</li>
+            <li>🛒 Create Orders</li>
+            <li>📦 Track Order Status</li>
+            <li>✏️ Update Existing Orders</li>
+            <li>🗑️ Delete Orders</li>
+            <li>💾 JSON-Based Data Storage</li>
+            <li>🔗 Client-Server Communication using Fetch API</li>
+        </ul>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Live API Demonstration</h2>
+
+        <p>
+            Click below to fetch menu data directly from the backend API.
+        </p>
+
+        <button onclick="loadMenu()">
+            Load Menu From Backend
+        </button>
+
+        <div id="menu"></div>
+
+    </div>
+
+    <p class="footer">
+        Built with Node.js, Express.js, HTML, CSS and JavaScript
+    </p>
+
+</div>
+
+<script>
+
+async function loadMenu() {
+
+    const response = await fetch("/menu");
+
+    const menu = await response.json();
+
+    document.getElementById("menu").innerHTML =
+        menu.map(item =>
+            `<div class="menu-item">
+                ${item.name} - ₹${item.price}
+            </div>`
+        ).join("");
+}
+
+</script>
+
+</body>
+</html>
