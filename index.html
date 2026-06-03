@@ -146,7 +146,8 @@
 <div class="toast" id="toast"></div>
 
 <script>
-    const API = "http://localhost:3000";
+    const API = window.location.origin;
+
     const emojis = {
         "Burger": "🍔",
         "Pizza": "🍕",
@@ -155,7 +156,6 @@
         "Biriyani": "🍛"
     };
 
-    // Load and display menu from backend
     async function loadMenu() {
         const res = await fetch(`${API}/menu`);
         const menu = await res.json();
@@ -181,13 +181,11 @@
         });
     }
 
-    // Click menu card to auto-select in dropdown
     function selectItem(id) {
         document.getElementById("itemSelect").value = id;
         document.querySelector(".order-form").scrollIntoView({ behavior: "smooth" });
     }
 
-    // Send itemId + quantity to backend, display what backend returns
     async function placeOrder() {
         const itemId = parseInt(document.getElementById("itemSelect").value);
         const quantity = parseInt(document.getElementById("quantityInput").value);
@@ -205,7 +203,6 @@
         const data = await res.json();
 
         if (res.ok) {
-            // Display total calculated by backend
             showToast(`✅ Order placed! Total: ₹${data.total}`);
             loadOrders();
         } else {
@@ -213,7 +210,6 @@
         }
     }
 
-    // Display all orders with backend-calculated values
     async function loadOrders() {
         const res = await fetch(`${API}/orders`);
         const orders = await res.json();
@@ -247,7 +243,6 @@
         `).join("");
     }
 
-    // Send updated status to backend
     async function updateOrder(id) {
         const status = document.getElementById(`status-${id}`).value;
         const res = await fetch(`${API}/order/${id}`, {
@@ -261,7 +256,6 @@
         }
     }
 
-    // Delete order via backend
     async function deleteOrder(id) {
         if (!confirm("Delete this order?")) return;
         const res = await fetch(`${API}/order/${id}`, { method: "DELETE" });
@@ -271,7 +265,6 @@
         }
     }
 
-    // Toast notification
     function showToast(msg, color = "green") {
         const t = document.getElementById("toast");
         t.textContent = msg;

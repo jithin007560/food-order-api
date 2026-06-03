@@ -1,11 +1,11 @@
 const express = require("express");
+const cors = require("cors");
+const path = require("path");
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
-
-// Serve index.html
-const path = require("path");
 app.use(express.static(path.join(__dirname)));
 
 // Menu Items
@@ -30,7 +30,7 @@ app.get("/menu", (req, res) => {
     res.json(menu);
 });
 
-// Place Order — all calculations done here
+// Place Order — all calculations here
 app.post("/order", (req, res) => {
 
     const { itemId, quantity } = req.body;
@@ -102,6 +102,7 @@ app.delete("/order/:id", (req, res) => {
 });
 
 // Start Server
-app.listen(3000, () => {
-    console.log("🚀 Server running on port 3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
 });
